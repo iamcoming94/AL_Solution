@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { User } from './userInterface';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +30,8 @@ export class UserService {
     });
   }
 
-  getAllUsers(){
-    return this.http.get(this.getAllUserURL);
+  getAllUsers():Observable<User[]>{
+    console.log('hit getAllUsers()');
+    return this.http.get<User[]>(this.getAllUserURL);
   }
 }

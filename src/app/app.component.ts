@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserService } from './user.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import {MatTableDataSource} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { element } from 'protractor';
+import { User } from './userInterface';
 
 @Component({
   selector: 'app-root',
@@ -26,8 +28,9 @@ export class AppComponent implements OnInit{
 
   dataSource = new MatTableDataSource<any>();
   data: any;
+  displayedColumns = ['userName', 'dateOfBirth', 'address', 'gender', 'contactNumber', 'howDidYouFindUsDropDownList', 'edit', 'delete'];
 
-  @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  // @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private formBuilder:FormBuilder, private http: HttpClient, private userService: UserService) { 
     this.editUserForm();
@@ -36,7 +39,9 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.editUserForm();
-    // this.data = this.getAllUser();
+    this.data = this.getAllUser();
+    // this.data = this.allItems;
+    console.log('data',this.data);
     // this.dataSource.data = this.data;
     // this.dataSource.paginator = this.paginator;
   }
@@ -65,7 +70,7 @@ export class AppComponent implements OnInit{
       "Address": userDetails.address,
       "Gender": userDetails.gender,
       "ContactNumber": userDetails.contactNumber,
-      "HowDidYouFindUsDropDownList": userDetails.howDidYouFindUs
+      "HowDidYouFindUsDropDownList": userDetails.HowDidYouFindUsDropDownList
     }
     this.userService.addUser(this.userModel);
     
@@ -96,7 +101,7 @@ submitForm(){
     "Address": userDetails.address,
     "Gender": userDetails.gender,
     "ContactNumber": userDetails.contactNumber,
-    "HowDidYouFindUsDropDownList": userDetails.howDidYouFindUs
+    "HowDidYouFindUsDropDownList": userDetails.HowDidYouFindUsDropDownList
   }
   this.userService.addUser(this.userModel);
   
@@ -106,9 +111,10 @@ submitForm(){
 
   getAllUser(){
     this.subscription = this.userService.getAllUsers().subscribe(result =>{
-      this.allItems = result;
-      console.log("all users", this.allItems);
+      this.dataSource.data = result;
+      console.log(result)
     })
+    // return this.userService.getAllUsers();
   }
 
   sortData($event){
@@ -122,6 +128,22 @@ submitForm(){
     else{
       this.dataSource.data = this.data.slice().sort(
         (a,b) => a[sortId] < b[sortId] ? -1 : a[sortId] > b[sortId] ? 1 : 0
+      );
+    }
+  }
+
+  openFilter(col:string){
+    document.getElementById(col + '-filter').removeAttribute('hidden');
+  }
+
+  closeFilter(col:string){
+    document.getElementById(col + '-filter').setAttribute('hidden', 'true');
+  }
+  filterData(col: string, filtertext: string){
+    if(filtertext.trim() != '')
+    {
+      this.dataSource.data = this.data.slice().filter(
+        (element) => JSON.stringify(element[col]).indexOf(filtertext) > -1
       );
     }
   }

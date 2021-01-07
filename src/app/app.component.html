@@ -90,21 +90,44 @@
   </div>
 </div>
 
+<br>
+<br>
 
-<!-- <mat-paginator [pageSize]="30" [pageSizeOptions]="[30,60,90]" showFirstListButtons></mat-paginator>
-
-<table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
-  <ng-container *ngFor="let col of displayColumns;" matColumnDef="{{col}}">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header id="{{col}}">{{col}}
-      <button mat-icon-button (click)="$event.stopPropagation(); openFilter(col);">
-        <img src="../assets/filter.jpg">
-      </button>
-      <input type="text" hidden id="{{col}}-filter"
-      (blur)="filterData(col, $event.target.value); closeFilter(col)" />
-    </th>
-    <th mat-cell *matCellDef="let element">{{element[col]}}</th>
-  </ng-container>
-  <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayColumns;"></tr>
-
-</table> -->
+<div>
+  <mat-table [dataSource]="dataSource">
+    <ng-container matColumnDef="userName">
+      <mat-header-cell *matHeaderCellDef> User Name </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.userName}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="address">
+      <mat-header-cell *matHeaderCellDef> Address </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.address}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="gender">
+      <mat-header-cell *matHeaderCellDef> Gender </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.gender}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="dateOfBirth">
+      <mat-header-cell *matHeaderCellDef> Date Of Birth </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.dateOfBirth}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="contactNumber">
+      <mat-header-cell *matHeaderCellDef> Contact Number </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.contactNumber}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="howDidYouFindUsDropDownList">
+      <mat-header-cell *matHeaderCellDef> How Did You Find Us </mat-header-cell>
+      <mat-cell *matCellDef="let user"> {{user.howDidYouFindUsDropDownList}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="edit">
+      <mat-header-cell *matHeaderCellDef> Edit </mat-header-cell>
+      <mat-cell *matCellDef="let user"> <button>Edit</button> </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="delete">
+      <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
+      <mat-cell *matCellDef="let user"> <button>Delete</button> </mat-cell>
+    </ng-container>
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>
