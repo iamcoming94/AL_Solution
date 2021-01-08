@@ -3,6 +3,7 @@
     <div class="col-md-12">
       <h1 class="page-title" style="text-align: center;">User Management</h1>
       <form [formGroup]="userForm" (ngSubmit)="submitForm()">
+        <div class="form-control" name="id" [hidden]="hiddenFlag"></div>
         <label>
           User Name <span class="requiredField">*</span>
         </label>        
@@ -73,18 +74,19 @@
         <label>
           How Did You Find Us <span class="requiredField">*</span>
         </label>
-        <select formControlName="howDidYouFindUs" name="howDidYouFindUs" class="form-control" [ngClass]="{'has-error': (userForm.get('howDidYouFindUs').errors) && (userForm.get('howDidYouFindUs').touched || userForm.get('howDidYouFindUs').dirty)}">
+        <select formControlName="howDidYouFindUsDropDownList" name="howDidYouFindUsDropDownList" class="form-control" [ngClass]="{'has-error': (userForm.get('howDidYouFindUsDropDownList').errors) && (userForm.get('howDidYouFindUsDropDownList').touched || userForm.get('howDidYouFindUsDropDownList').dirty)}">
             <option [ngValue]="" disabled>Select Options</option>
             <option *ngFor="let media of mediaDDL" [ngValue]="media" >{{media}}</option>
         </select>
-        <div *ngIf="(userForm.get('howDidYouFindUs').errors) && (userForm.get('howDidYouFindUs').touched || userForm.get('howDidYouFindUs').dirty)" class="alert alert-danger">
-            <span *ngIf="userForm.get('howDidYouFindUs').errors.required">
+        <div *ngIf="(userForm.get('howDidYouFindUsDropDownList').errors) && (userForm.get('howDidYouFindUsDropDownList').touched || userForm.get('howDidYouFindUsDropDownList').dirty)" class="alert alert-danger">
+            <span *ngIf="userForm.get('howDidYouFindUsDropDownList').errors.required">
               This field is required.
             </span>
         </div>
         <br>
 
         <button class="btn btn-danger btn-block">Submit</button>
+        <button class="btn btn-warning btn-block" (click)="resetPage()">Reset Page</button>
       </form>
     </div>
   </div>
@@ -121,11 +123,11 @@
     </ng-container>
     <ng-container matColumnDef="edit">
       <mat-header-cell *matHeaderCellDef> Edit </mat-header-cell>
-      <mat-cell *matCellDef="let user"> <button>Edit</button> </mat-cell>
+      <mat-cell *matCellDef="let user"> <button (click)="editUser(user.id)">Edit</button> </mat-cell>
     </ng-container>
     <ng-container matColumnDef="delete">
       <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
-      <mat-cell *matCellDef="let user"> <button>Delete</button> </mat-cell>
+      <mat-cell *matCellDef="let user"> <button (click)="deleteUser(user.id)">Delete</button> </mat-cell>
     </ng-container>
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

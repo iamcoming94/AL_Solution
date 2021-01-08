@@ -2,11 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UserService } from './user.service';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import {MatTableDataSource} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { element } from 'protractor';
 import { User } from './userInterface';
+import { map } from 'rxjs/operators';
+import { userInfo } from 'os';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +32,9 @@ export class AppComponent implements OnInit{
   data: any;
   displayedColumns = ['userName', 'dateOfBirth', 'address', 'gender', 'contactNumber', 'howDidYouFindUsDropDownList', 'edit', 'delete'];
 
+  public userData : any;
+  hiddenFlag : boolean;
+
   // @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
   constructor(private formBuilder:FormBuilder, private http: HttpClient, private userService: UserService) { 
@@ -38,6 +43,7 @@ export class AppComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.hiddenFlag = true;
     this.editUserForm();
     this.data = this.getAllUser();
     // this.data = this.allItems;
@@ -48,12 +54,13 @@ export class AppComponent implements OnInit{
 
   editUserForm(){
     this.userForm = this.formBuilder.group({
+      id:[''],
       name: ['', [Validators.required, Validators.minLength(2)]],
       dateOfBirth: ['', [Validators.required]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       gender: ['', [Validators.required, Validators.minLength(1)]],
       contactNumber: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
-      howDidYouFindUs: ['Select Option', [Validators.required]]
+      howDidYouFindUsDropDownList: ['Select Option', [Validators.required]]
     });
   }
 
@@ -70,7 +77,7 @@ export class AppComponent implements OnInit{
       "Address": userDetails.address,
       "Gender": userDetails.gender,
       "ContactNumber": userDetails.contactNumber,
-      "HowDidYouFindUsDropDownList": userDetails.HowDidYouFindUsDropDownList
+      "HowDidYouFindUsDropDownList": userDetails.howDidYouFindUsDropDownList
     }
     this.userService.addUser(this.userModel);
     
@@ -91,20 +98,32 @@ submitForm(){
   if(this.userForm.invalid){
     return;
   }
-  // this.productForm.controls['your form control name'].value
-  // this.productModel = this.productForm.getRawValue();
   var userDetails = this.userForm.getRawValue();
-  
+
   this.userModel = {
     'UserName': userDetails.name,
     'DateOfBirth': userDetails.dateOfBirth,
     "Address": userDetails.address,
     "Gender": userDetails.gender,
     "ContactNumber": userDetails.contactNumber,
-    "HowDidYouFindUsDropDownList": userDetails.HowDidYouFindUsDropDownList
+    "HowDidYouFindUsDropDownList": userDetails.howDidYouFindUsDropDownList
   }
-  this.userService.addUser(this.userModel);
-  
+
+  console.log('submitForm', userDetails.id);
+  if(userDetails.id != 0)
+  {
+    console.log('entered edit mode', userDetails.id);
+    this.userService.editUser(userDetails.id, this.userModel);
+  }
+
+  else
+  {
+    console.log('entered create mode', userDetails.id);
+    
+    this.userService.addUser(this.userModel);
+  }
+
+  window.location.reload();
   //reload form
   this.editUserForm();
   }
@@ -146,6 +165,37 @@ submitForm(){
         (element) => JSON.stringify(element[col]).indexOf(filtertext) > -1
       );
     }
+  }
+
+  editUser(id){
+    console.log("this is the user id ", id);
+    this.subscription = this.userService.getUser(id).subscribe(result => {
+      this.userData = result;
+      console.log('editformdata', this.userData);
+      this.userForm.setValue({
+        id: this.userData.id,
+        name: this.userData.userName,
+        dateOfBirth : this.userData.dateOfBirth,
+        address : this.userData.address,
+        gender : this.userData.gender,
+        contactNumber : this.userData.contactNumber,
+        howDidYouFindUsDropDownList : this.userData.howDidYouFindUsDropDownList
+      });
+    })
+  }
+
+  deleteUser(id){
+    console.log("this is delete id ", id);
+    this.userService.deleteUser(id);
+    window.location.reload();
+  }
+
+  resetPage(){
+    window.location.reload();
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
 }
